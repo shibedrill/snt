@@ -1,6 +1,8 @@
 
 use std::net::IpAddr;
 
+use is_wsl::is_wsl;
+
 fn main() {
     println!("Smart Network Troubleshooter");
     interface();
@@ -67,23 +69,23 @@ fn routing() {
     fn ping_and_log(name: &str, addr: IpAddr) {
         match tracert::ping::Pinger::new(addr) {
             Ok(pinger) => {
-                println!("routing::ping::{}::pinger: true", name);
+                println!("routing::ping::{}::pinger: ok", name);
                 match pinger.ping() {
                     Ok(result) => {
                         match result.status {
-                            tracert::ping::PingStatus::Error => { eprintln!("routing::ping::{}::status: error", name) },
-                            tracert::ping::PingStatus::Timeout => { eprintln!("routing::ping::{}::status: timeout", name) },
-                            tracert::ping::PingStatus::Done => { println!("routing::ping::{}::status: done", name) },
+                            tracert::ping::PingStatus::Error => { eprintln!("routing::ping::{}::response::status: error", name) },
+                            tracert::ping::PingStatus::Timeout => { eprintln!("routing::ping::{}::response::status: timeout", name) },
+                            tracert::ping::PingStatus::Done => { println!("routing::ping::{}::response::status: done", name) },
                         }
                     },
                     Err(what) => {
-                        eprintln!("routing::ping::{}::response: false", name);
+                        eprintln!("routing::ping::{}::response: error", name);
                         eprintln!("verbose error: {}", what);
                     },
                 }
             },
             Err(what) => {
-                eprintln!("routing::ping::{}::pinger: false", name);
+                eprintln!("routing::ping::{}::pinger: error", name);
                 eprintln!("verbose error: {}", what);
             },
         }
@@ -100,7 +102,12 @@ fn routing() {
 
     ping_and_log("cloudflare_v4", cloudflare_v4);
     ping_and_log("google_v4", google_v4);
-    ping_and_log("cloudflare_v6", cloudflare_v6);
-    ping_and_log("google_v6", google_v6);
+
+    if is_wsl() {
+        eprintln!("routing::ping: IPv6 is broken in WSL. Not running IPv6 pings.");
+    } else {
+        ping_and_log("cloudflare_v6", cloudflare_v6);
+        ping_and_log("google_v6", google_v6);
+    }
 
 }
