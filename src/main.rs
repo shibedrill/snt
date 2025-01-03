@@ -1,5 +1,5 @@
 
-use std::net::IpAddr;
+use std::{net::IpAddr, time::Duration};
 
 use tracert;
 
@@ -10,6 +10,9 @@ fn main() {
 }
 
 fn interface() {
+
+    println!();
+
     match default_net::get_interfaces().is_empty() {
         true => eprintln!("interface::any::exists: false"),
         false => println!("interface::any::exists: true"),
@@ -34,6 +37,16 @@ fn interface() {
             } else {
                 eprintln!("interface::default::up: false");
             }
+            if def_if.ipv4.is_empty() {
+                eprintln!("interface::default::ipv4: false");
+            } else {
+                println!("interface::default::ipv4: true");
+            }
+            if def_if.ipv6.is_empty() {
+                eprintln!("interface::default::ipv6: false");
+            } else {
+                println!("interface::default::ipv6: true");
+            }
         }
         Err(what) => {
             eprintln!("interface::default::exists: false");
@@ -43,6 +56,8 @@ fn interface() {
 }
 
 fn routing() {
+
+    println!();
 
     let localhost: IpAddr = "127.0.0.1".parse().unwrap();
     let cloudflare_v4: IpAddr = "1.1.1.1".parse().unwrap();
@@ -86,8 +101,8 @@ fn routing() {
     }
 
     ping_and_log("cloudflare_v4", cloudflare_v4);
-    ping_and_log("cloudflare_v6", cloudflare_v6);
     ping_and_log("google_v4", google_v4);
+    ping_and_log("cloudflare_v6", cloudflare_v6);
     ping_and_log("google_v6", google_v6);
 
 }
