@@ -1,10 +1,20 @@
 
 use std::net::IpAddr;
-
 use is_wsl::is_wsl;
+use is_root::is_root;
 
 fn main() {
-    println!("Smart Network Troubleshooter");
+    println!("Smart Network Troubleshooter v{}", env!("CARGO_PKG_VERSION"));
+
+    println!();
+    println!("Running tests: Pre-execution");
+    if !is_root() {
+        eprintln!("self::root: false");
+        eprintln!("process must be run as root!");
+        std::process::exit(-1);
+    } else {
+        println!("self:root: true");
+    }
     interface();
     routing();
 }
@@ -12,6 +22,7 @@ fn main() {
 fn interface() {
 
     println!();
+    println!("Running tests: Interfaces");
 
     match default_net::get_interfaces().is_empty() {
         true => eprintln!("interface::any::exists: false"),
@@ -58,6 +69,7 @@ fn interface() {
 fn routing() {
 
     println!();
+    println!("Running tests: Routing");
 
     let localhost: IpAddr = "127.0.0.1".parse().unwrap();
     let cloudflare_v4: IpAddr = "1.1.1.1".parse().unwrap();
