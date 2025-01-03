@@ -1,7 +1,5 @@
 
-use std::{net::IpAddr, time::Duration};
-
-use tracert;
+use std::net::IpAddr;
 
 fn main() {
     println!("Smart Network Troubleshooter");
